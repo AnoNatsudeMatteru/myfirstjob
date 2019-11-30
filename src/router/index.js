@@ -138,7 +138,7 @@ export const asyncRouterMap = [
         component:  _import('controlpanel/user/user'),
         redirect: '/user/',
         name: '用户列表',
-        meta: {title: '用户权限', icon: 'table'},
+        meta: {title: '用户列表', icon: 'table'},
         children: [
           {
             path: '', name: '用户列表', component: _import('controlpanel/user/user'), meta: {title: '用户列表', icon: 'user'}, menu: 'user'

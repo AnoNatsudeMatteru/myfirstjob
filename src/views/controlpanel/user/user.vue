@@ -19,15 +19,12 @@
       <el-table-column align="center" label="用户名" prop="userName" style="width: 60px;"></el-table-column>
       <el-table-column align="center" label="角色" width="100">
         <template slot-scope="scope">
-          <el-tag type="success" v-text="list.roleName" v-if="list.roleId===1"></el-tag>
-<!--          <el-tag type="success" v-text="scope.row.characterName" v-if="scope.row.characterId===1"></el-tag>-->
-          <el-tag type="primary" v-text="list.roleName" v-else></el-tag>
-<!--          <el-tag type="primary" v-text="scope.row.characterName" v-else></el-tag>-->
-
+          <el-tag type="success" v-text="scope.row.characterList.characterName" v-if="scope.row.characterList.characterId===1"></el-tag>
+          <el-tag type="primary" v-text="scope.row.characterList.characterName" v-else></el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="创建时间" prop="creatTime" width="170"></el-table-column>
-      <el-table-column align="center" label="最近修改时间" prop="updateTime" width="170"></el-table-column>
+      <el-table-column align="center" label="创建时间" prop="creatTime" width="170" :formatter="dateFormat"></el-table-column>
+      <el-table-column align="center" label="最近修改时间" prop="updateTime" width="170" :formatter="dateFormat"></el-table-column>
       <el-table-column align="center" label="管理" width="220" v-if="hasPerm('user:update')">
         <template slot-scope="scope">
           <el-button type="primary" icon="edit" @click="showUpdate(scope.$index)">修改</el-button>
@@ -64,7 +61,7 @@
         <el-form-item label="角色" required>
           <el-select v-model="tempUser.characterId" placeholder="请选择">
             <el-option
-              v-for="item in characterList"
+              v-for="item in characterLists"
               :key="item.characterId"
               :label="item.characterName"
               :value="item.characterId">
@@ -97,7 +94,7 @@
           pageNum: 1,//页码
           pageSize: 50,//每页条数
         },
-          characterList: [],//角色列表
+          characterLists: [],//角色列表
         dialogStatus: 'create',
         dialogFormVisible: false,
         textMap: {
@@ -125,12 +122,16 @@
       ])
     },
     methods: {
+        dateFormat:function(row,column){
+            var t=new Date(row.updateTime);//row 表示一行数据, updateTime 表示要格式化的字段名称
+            return t.getFullYear()+"-"+(t.getMonth()+1)+"-"+t.getDate()+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds();
+        },
       getAllRoles() {
         this.api({
           url: "/user/selectRole",
           method: "post"
         }).then(data => {
-          this.characterList = data.characterList;
+          this.characterLists = data.info;
         })
       },
       getList() {
