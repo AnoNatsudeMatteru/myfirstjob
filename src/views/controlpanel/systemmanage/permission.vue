@@ -8,13 +8,24 @@
           <span v-text="getIndex(scope.$index)"> </span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="分类" prop="icon" width="150"></el-table-column>
+      <el-table-column align="center" label="分类" width="150">
+        <template slot-scope="scope">
+          <el-tag v-text="'增加'" v-if="scope.row.icon==='1'" type="success"></el-tag>
+          <el-tag v-text="'删除'" v-if="scope.row.icon==='2'" type="danger"></el-tag>
+          <el-tag v-text="'修改'" v-if="scope.row.icon==='3'" type="warning"></el-tag>
+          <el-tag v-text="'查询'" v-if="scope.row.icon==='4'" type="primary"></el-tag>
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="名称" prop="permissionName"></el-table-column>
       <el-table-column align="center" label="说明" prop="description" width="420"></el-table-column>
-      <el-table-column align="center" label="角色">
+      <el-table-column align="center" label="菜单" prop="menuList" ></el-table-column>
+      <el-table-column align="center" label="角色" width="420">
         <template slot-scope="scope">
-          <div v-for="role in scope.row.roles">
-            <div v-text="role.roleName" style="display: inline-block;vertical-align: middle;"></div>
+          <div v-for="role in scope.row.roleList">
+            <div style="display: inline-block;vertical-align: middle">
+              <el-tag v-text="role" v-if="role==='admin'" type="success"></el-tag>
+              <el-tag v-text="role" v-else type="primary"></el-tag>
+            </div>
           </div>
         </template>
       </el-table-column>
@@ -36,7 +47,7 @@
       getAllPermisson() {
         //查询所有权限
         this.api({
-          url: "/user/selectAllPermission",
+          url: "/permissions",
           method: "get"
         }).then(data => {
           this.list = data.list;

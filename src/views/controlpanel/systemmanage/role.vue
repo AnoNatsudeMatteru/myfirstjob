@@ -3,7 +3,7 @@
     <div class="filter-container">
       <el-form>
         <el-form-item>
-          <el-button type="success" icon="plus" v-if="hasPerm('user:add')" @click="showCreate">添加角色
+          <el-button type="success" icon="plus" v-if="hasPerm('role:add')" @click="showCreate">添加角色
           </el-button>
         </el-form-item>
       </el-form>
@@ -15,21 +15,21 @@
           <span v-text="getIndex(scope.$index)"> </span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="角色" prop="roleName" width="150"></el-table-column>
+      <el-table-column align="center" label="角色" prop="characterName" width="150"></el-table-column>
       <el-table-column align="center" label="用户">
         <template slot-scope="scope">
           <div v-for="user in scope.row.users">
-            <div v-text="user.nickname" style="display: inline-block;vertical-align: middle;"></div>
+            <div v-text="user.userName" style="display: inline-block;vertical-align: middle;"></div>
           </div>
         </template>
       </el-table-column>
       <el-table-column align="center" label="菜单&权限" width="420">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.roleName==adminName" type="success">全部</el-tag>
+          <el-tag v-if="scope.row.characterId===1" type="success">全部</el-tag>
           <div v-else>
             <div v-for="menu in scope.row.menus" style="text-align: left">
-              <span style="width: 100px;display: inline-block;text-align: right ">{{menu.menuName}}</span>
-              <el-tag v-for="perm in menu.permissions" :key="perm.permissionName" v-text="perm.permissionName"
+              <span style="width: 100px;display: inline-block;text-align: right ">{{menu.menuComment}}</span>
+              <el-tag v-for="perm in menu.permissions" :key="perm.description" v-text="perm.description"
                       style="margin-right: 3px;"
                       type="primary"></el-tag>
             </div>
@@ -38,7 +38,7 @@
       </el-table-column>
       <el-table-column align="center" label="管理" width="220" v-if="hasPerm('role:update') ||hasPerm('role:delete') ">
         <template slot-scope="scope">
-          <div v-if="scope.row.roleName!='管理员'">
+          <div v-if="scope.row.characterId!==1">
             <el-button type="primary" icon="edit" @click="showUpdate(scope.$index)" v-if="hasPerm('role:update')">修改
             </el-button>
             <el-button v-if=" scope.row.users && scope.row.users.length===0 && hasPerm('role:delete')" type="danger"
@@ -52,23 +52,28 @@
     </el-table>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form class="small-space" :model="tempRole" label-position="left" label-width="100px"
-               style='width: 600px; margin-left:50px;'>
+               style='width: 800px; margin-left:50px;'>
         <el-form-item label="角色名称" required>
           <el-input type="text" v-model="tempRole.roleName" style="width: 250px;">
           </el-input>
         </el-form-item>
         <el-form-item label="菜单&权限" required>
-          <div v-for=" (menu,_index) in allPermission" :key="menu.menuName">
+          <div v-for=" (menu,_index) in allPermission" :key="menu.menuId">
             <span style="width: 100px;display: inline-block;">
               <el-button :type="isMenuNone(_index)?'':(isMenuAll(_index)?'success':'primary')" size="mini"
                          style="width:80px;"
-                         @click="checkAll(_index)">{{menu.menuName}}</el-button>
+                         @click="checkAll(_index)">
+                {{menu.menuComment}}
+              </el-button>
+                <el-checkbox v-model="tempRole.menus" :label="menu.menuId" v-if="false">
+
+                </el-checkbox>
             </span>
             <div style="display: inline-block;margin-left:20px;">
               <el-checkbox-group v-model="tempRole.permissions">
-                <el-checkbox v-for="perm in menu.permissions" :label="perm.id" @change="checkRequired(perm,_index)"
-                             :key="perm.id">
-                  <span :class="{requiredPerm:perm.requiredPerm===1}">{{perm.permissionName}}</span>
+                <el-checkbox v-for="perm in menu.permissions" :label="perm.permissionId" @change="checkRequired(perm,_index)"
+                             :key="perm.permissionId">
+                  <span :class="{requiredPerm:perm.requiredPerm===1}">{{perm.description}}</span>
                 </el-checkbox>
               </el-checkbox-group>
             </div>
@@ -113,21 +118,23 @@
       getAllPermisson() {
         //查询所有权限
         this.api({
-          url: "/user/listAllPermission",
+          url: "/menuPermission",
           method: "get"
         }).then(data => {
           this.allPermission = data.list;
+          console.log(this.allPermission)
         })
       },
       getList() {
         //查询列表
         this.listLoading = true;
         this.api({
-          url: "/user/listRole",
+          url: "/roleUserMenuPermission",
           method: "get"
         }).then(data => {
           this.listLoading = false;
           this.list = data.list;
+          console.log(this.list)
         })
       },
       getIndex($index) {
@@ -144,8 +151,8 @@
       },
       showUpdate($index) {
         let role = this.list[$index];
-        this.tempRole.roleName = role.roleName;
-        this.tempRole.roleId = role.roleId;
+        this.tempRole.roleName = role.characterName;
+        this.tempRole.roleId = role.characterId;
         this.tempRole.permissions = [];
         for (let i = 0; i < role.menus.length; i++) {
           let perm = role.menus[i].permissions;
@@ -165,7 +172,7 @@
         }
         //添加新角色
         this.api({
-          url: "/user/addRole",
+          url: "/user/role",
           method: "post",
           data: this.tempRole
         }).then(() => {
@@ -182,8 +189,8 @@
         }
         //修改角色
         this.api({
-          url: "/user/updateRole",
-          method: "post",
+          url: "/user/role",
+          method: "put",
           data: this.tempRole
         }).then(() => {
           this.getList();
@@ -225,11 +232,11 @@
         }).then(() => {
           let role = _vue.list[$index];
           _vue.api({
-            url: "/user/deleteRole",
-            method: "post",
-            data: {
-              roleId: role.roleId
-            }
+            url: "/user/role/"+role.characterId,
+            method: "delete",
+            // data: {
+            //   roleId: role.roleId
+            // }
           }).then(() => {
             _vue.getList()
           }).catch(e => {
@@ -241,7 +248,7 @@
         let menu = this.allPermission[_index].permissions;
         let result = true;
         for (let j = 0; j < menu.length; j++) {
-          if (this.tempRole.permissions.indexOf(menu[j].id) > -1) {
+          if (this.tempRole.permissions.indexOf(menu[j].permissionId) > -1) {
             result = false;
             break;
           }
@@ -253,7 +260,7 @@
         let menu = this.allPermission[_index].permissions;
         let result = true;
         for (let j = 0; j < menu.length; j++) {
-          if (this.tempRole.permissions.indexOf(menu[j].id) < 0) {
+          if (this.tempRole.permissions.indexOf(menu[j].permissionId) < 0) {
             result = false;
             break;
           }
@@ -275,14 +282,14 @@
         //全部选中
         let menu = this.allPermission[_index].permissions;
         for (let j = 0; j < menu.length; j++) {
-          this.addUnique(menu[j].id, this.tempRole.permissions)
+          this.addUnique(menu[j].permissionId, this.tempRole.permissions)
         }
       },
       noPerm(_index) {
         //全部取消选中
         let menu = this.allPermission[_index].permissions;
         for (let j = 0; j < menu.length; j++) {
-          let idIndex = this.tempRole.permissions.indexOf(menu[j].id);
+          let idIndex = this.tempRole.permissions.indexOf(menu[j].permissionId);
           if (idIndex > -1) {
             this.tempRole.permissions.splice(idIndex, 1);
           }

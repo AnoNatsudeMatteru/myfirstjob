@@ -119,17 +119,17 @@ export const asyncRouterMap = [
       {
         path: '/systemManage',
         name: '系统设置',
-       component:  _import('controlpanel/systemmanage/environmentsetting'),
+       component:  Layout,
         meta:{title: '系统设置', icon: 'table'},
         children: [
           {
-            path:'', name: '环境设置', component: _import('controlpanel/systemmanage/environmentsetting'), meta: {title: '环境设置', icon: 'user'}, menu: 'environmentSetting'
+            path:'', name: '环境设置', component: _import('controlpanel/systemmanage/environmentsetting'), meta: {title: '环境设置', icon: 'el-icon-setting'}, menu: 'environmentSetting'
           },
           {
-            path:'role', name: '角色管理',component: _import('controlpanel/systemmanage/role'), meta: {title: '角色管理', icon: 'user'}, menu: 'characterManage'
+            path:'role', name: '角色管理',component: _import('controlpanel/systemmanage/role'), meta: {title: '角色管理', icon: 'el-icon-user-solid'}, menu: 'characterManage'
           },
           {
-            path:'permissionSelect', name: '权限查询',component: _import('controlpanel/systemmanage/permission'), meta: {title: '权限查询', icon: 'user'}, menu: 'permissionSelect'
+            path:'permissionSelect', name: '权限查询',component: _import('controlpanel/systemmanage/permission'), meta: {title: '权限查询', icon: 'el-icon-lock'}, menu: 'permissionSelect'
           }
         ]
       },
@@ -153,16 +153,16 @@ export const asyncRouterMap = [
         meta:{title: '官网管理', icon: 'table'},
         children: [
           {
-            path:'', name: '招聘管理',component: _import('controlpanel/webmanage/career'), meta: {title: '招聘管理', icon: 'user'}, menu: 'career'
+            path:'', name: '招聘管理',component: _import('controlpanel/webmanage/career'), meta: {title: '招聘管理', icon: 'el-icon-phone'}, menu: 'career'
           },
           {
-            path:'news', name: '新闻管理',component: _import('controlpanel/webmanage/news'), meta: {title: '新闻管理', icon: 'user'}, menu: 'news'
+            path:'news', name: '新闻管理',component: _import('controlpanel/webmanage/news'), meta: {title: '新闻管理', icon: 'el-icon-document'}, menu: 'news'
           },
           {
-            path:'product', name: '产品管理',component: _import('controlpanel/webmanage/product'), meta: {title: '产品管理', icon: 'user'}, menu: 'product'
+            path:'product', name: '产品管理',component: _import('controlpanel/webmanage/product'), meta: {title: '产品管理', icon: 'el-icon-s-platform'}, menu: 'product'
           },
           {
-            path:'partner', name: '合作伙伴管理',component: _import('controlpanel/webmanage/partner'), meta: {title: '合作伙伴管理', icon: 'user'}, menu: 'partner'
+            path:'partner', name: '合作伙伴管理',component: _import('controlpanel/webmanage/partner'), meta: {title: '合作伙伴管理', icon: 'el-icon-s-cooperation'}, menu: 'partner'
           }
         ]
       }

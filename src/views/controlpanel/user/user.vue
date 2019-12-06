@@ -23,7 +23,7 @@
           <el-tag type="primary" v-text="scope.row.characterList.characterName" v-else></el-tag>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="创建时间" prop="creatTime" width="170" :formatter="dateFormat"></el-table-column>
+      <el-table-column align="center" label="创建时间" prop="creatTime" width="170" :formatter="dateFormatCreatTime"></el-table-column>
       <el-table-column align="center" label="最近修改时间" prop="updateTime" width="170" :formatter="dateFormat"></el-table-column>
       <el-table-column align="center" label="管理" width="220" v-if="hasPerm('user:update')">
         <template slot-scope="scope">
@@ -51,11 +51,11 @@
           </el-input>
         </el-form-item>
         <el-form-item label="密码" v-if="dialogStatus=='create'" required>
-          <el-input type="password" v-model="tempUser.password">
+          <el-input type="password" v-model="tempUser.userPassword">
           </el-input>
         </el-form-item>
         <el-form-item label="新密码" v-else>
-          <el-input type="password" v-model="tempUser.password" placeholder="不填则表示不修改">
+          <el-input type="password" v-model="tempUser.userPassword" placeholder="不填则表示不修改">
           </el-input>
         </el-form-item>
         <el-form-item label="角色" required>
@@ -69,7 +69,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="昵称" required>
-          <el-input type="text" v-model="tempUser.nickname">
+          <el-input type="text" v-model="tempUser.nickName">
           </el-input>
         </el-form-item>
       </el-form>
@@ -93,6 +93,7 @@
         listQuery: {
           pageNum: 1,//页码
           pageSize: 50,//每页条数
+            userName: '{userName}'
         },
           characterLists: [],//角色列表
         dialogStatus: 'create',
@@ -103,8 +104,8 @@
         },
         tempUser: {
           userName: '',
-          password: '',
-          nickname: '',
+          userPassword: '',
+          nickName: '',
           characterId: '',
           userId: ''
         }
@@ -123,24 +124,31 @@
     },
     methods: {
         dateFormat:function(row,column){
-            var t=new Date(row.updateTime);//row 表示一行数据, updateTime 表示要格式化的字段名称
-            return t.getFullYear()+"-"+(t.getMonth()+1)+"-"+t.getDate()+" "+t.getHours()+":"+t.getMinutes()+":"+t.getSeconds();
+            if (row.updateTime!==undefined && row.updateTime !==null) {
+                var t = new Date(row.updateTime);//row 表示一行数据, updateTime 表示要格式化的字段名称
+                return t.getFullYear() + "-" + (t.getMonth() + 1) + "-" + t.getDate() + " " + t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds();
+            }
+        },
+        dateFormatCreatTime:function(row,column){
+            var t = new Date(row.creatTime);//row 表示一行数据, updateTime 表示要格式化的字段名称
+            return t.getFullYear() + "-" + (t.getMonth() + 1) + "-" + t.getDate() + " " + t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds();
         },
       getAllRoles() {
         this.api({
-          url: "/user/selectRole",
-          method: "post"
+          url: "/user/roles",
+          method: "get"
         }).then(data => {
-          this.characterLists = data.info;
+          this.characterLists = data.list.characterLists;
+          console.log(data)
         })
       },
       getList() {
         //查询列表
         this.listLoading = true;
         this.api({
-          url: "/user/selectUser",
-          method: "post",
-          params: this.listQuery
+          url: "/users"+"/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize,
+          method: "get",
+          //  params: this.listQuery
         }).then(data => {
           this.listLoading = false;
           this.list = data.list;
@@ -179,7 +187,7 @@
       showUpdate($index) {
         let user = this.list[$index];
         this.tempUser.userName = user.userName;
-        this.tempUser.nickname = user.nickname;
+        this.tempUser.nickName = user.nickName;
         this.tempUser.characterId = user.characterId;
         this.tempUser.userId = user.userId;
         this.tempUser.deleteStatus = '1';
@@ -190,9 +198,14 @@
       createUser() {
         //添加新用户
         this.api({
-          url: "/user/addUser",
+          url: "/user",
           method: "post",
-          data: this.tempUser
+          data: {
+              userName: this.tempUser.userName,
+              userPassword: this.tempUser.userPassword,
+              characterId: this.tempUser.characterId,
+              nickName: this.tempUser.nickName,
+          }
         }).then(() => {
           this.getList();
           this.dialogFormVisible = false
@@ -202,9 +215,14 @@
         //修改用户信息
         let _vue = this;
         this.api({
-          url: "/user/updateUser",
-          method: "post",
-          data: this.tempUser
+          url: "/user",
+          method: "put",
+          data: {
+              userId: this.tempUser.userId,
+              userPassword: this.tempUser.userPassword,
+              characterId: this.tempUser.characterId,
+              nickName: this.tempUser.nickName,
+          }
         }).then(() => {
           let msg = "修改成功";
           this.dialogFormVisible = false
@@ -231,9 +249,8 @@
           let user = _vue.list[$index];
           user.deleteStatus = '2';
           _vue.api({
-            url: "/user/updateUser",
-            method: "post",
-            data: user
+            url: "/user/"+user.userId,
+            method: "delete",
           }).then(() => {
             _vue.getList()
           }).catch(() => {
