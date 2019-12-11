@@ -22,7 +22,7 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    host: 'http://192.168.89.125:',
+    host: '192.168.89.125',
     port: 9520,
     autoOpenBrowser: true,
     autoOpenPage: '/login',
