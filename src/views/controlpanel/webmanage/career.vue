@@ -173,7 +173,8 @@
         this.tempCareer.careerSalary = this.list[$index].careerSalary;
         this.tempCareer.careerType = this.list[$index].careerType;
         this.dialogStatus = "update";
-        this.dialogFormVisible = true
+        this.dialogFormVisible = true;
+          console.log(this.tempCareer.careerType)
       },
       createCareer() {
         //保存新文章

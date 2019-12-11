@@ -15,15 +15,16 @@
           <span v-text="getIndex(scope.$index)"> </span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="角色" prop="characterName" width="150"></el-table-column>
+      <el-table-column align="center" label="角色" prop="characterName" width="80"></el-table-column>
       <el-table-column align="center" label="用户">
         <template slot-scope="scope">
-          <div v-for="user in scope.row.users">
-            <div v-text="user.userName" style="display: inline-block;vertical-align: middle;"></div>
-          </div>
+<!--          <div v-for="user in scope.row.users">-->
+<!--            <div v-text="user.userName" style="display: inline-block;vertical-align: middle;"></div>-->
+<!--          </div>-->
+          <span v-text="scope.row.users.length+'人'"/>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="菜单&权限" width="420">
+      <el-table-column align="center" label="菜单&权限" width="600">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.characterId===1" type="success">全部</el-tag>
           <div v-else>

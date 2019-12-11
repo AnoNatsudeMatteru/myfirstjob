@@ -45,16 +45,15 @@
       :page-sizes="[10, 20, 50, 100]"
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible":fullscreen="true">
       <el-form class="small-space" :model="tempNews" label-position="left" label-width="80px"
-               style='width: 600px; margin-left:50px;'>
+               style='width: 1800px; margin-left:50px;'>
         <el-form-item label="新闻标题" required>
           <el-input type="text" v-model="tempNews.newsTitle">
           </el-input>
         </el-form-item>
         <el-form-item label="新闻内容" required>
-          <el-input type="textarea" v-model="tempNews.newsContent">
-          </el-input>
+          <editoritem v-model="tempNews.newsContent"></editoritem>
         </el-form-item>
         <el-form-item label="类型" required>
           <el-radio-group v-model="tempNews.newsType">
@@ -73,7 +72,9 @@
   </div>
 </template>
 <script>
+  import editoritem from '../../../components/wangeditor/Editor'
     export default {
+        components: {editoritem},
         data() {
             return {
                 totalCount: 0, //分页组件--数据总条数
@@ -94,7 +95,9 @@
                     newsTitle: "",
                     newsContent: "",
                     newsType: "",
-                }
+                    newsPicture:"",
+                },
+                editorContent: ''
             }
         },
         created() {
@@ -138,20 +141,28 @@
                 this.tempNews.newsId = "";
                 this.tempNews.newsContent = "";
                 this.tempNews.newsType = "";
+                this.tempNews.newsPicture = "";
                 this.dialogStatus = "create";
                 this.dialogFormVisible = true;
             },
             showUpdate($index) {
                 //显示修改对话框
-                this.tempNews.newsId = this.list[$index].newsId;
-                this.tempNews.newsTitle = this.list[$index].newsTitle;
-                this.tempNews.newsContent = this.list[$index].newsContent;
-                this.tempNews.newsType = this.list[$index].newsType;
-                this.dialogStatus = "update";
-                this.dialogFormVisible = true
+                this.api({
+                    url: "/news/"+this.list[$index].newsId,
+                    method: "get",
+                }).then( data =>{
+                    this.tempNews.newsId = data.list.newsId;
+                    this.tempNews.newsTitle = data.list.newsTitle;
+                    this.tempNews.newsContent = data.list.newsContent;
+                    this.tempNews.newsType = data.list.newsType;
+                    this.tempNews.newsPicture = data.list.newsPicture;
+                    this.dialogStatus = "update";
+                    this.dialogFormVisible = true
+                })
             },
             createNews() {
                 //保存新文章
+                this.tempNews.newsPicture=this.firstImg(this.tempNews.newsContent);
                 this.api({
                     url: "/news",
                     method: "post",
@@ -190,6 +201,16 @@
                     })
                 })
             },
+            firstImg(str){
+                let img = '';
+                str.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/, function (match, capture) {
+                    img =  capture;
+                });
+                img = img.replace(/<\/?[^>]*>/g,''); //去除HTML tag
+                img = img.replace(/[ | ]*\n/g,'\n'); //去除行尾空白
+                img=img.replace(/ /ig,'');//去掉
+                return img;
+            }
         }
     }
 </script>
