@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueQuillEditor from 'vue-quill-editor'
+import editoritem from './components/wangeditor/Editor'
 import 'normalize.css/normalize.css'// A modern alternative to CSS resets
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
@@ -11,11 +11,8 @@ import '@/icons' // icon
 import '@/permission' // 权限
 import {default as api} from './utils/api'
 import {hasPermission} from "./utils/hasPermission";
-import 'quill/dist/quill.core.css';
-import 'quill/dist/quill.snow.css';
-import 'quill/dist/quill.bubble.css';
 Vue.use(ElementUI, {locale});
-Vue.use(VueQuillEditor);
+Vue.component('editoritem',editoritem);
 Vue.prototype.api = api;
 //全局的常量
 Vue.prototype.hasPerm = hasPermission

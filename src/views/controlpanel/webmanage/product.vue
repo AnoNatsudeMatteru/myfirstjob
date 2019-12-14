@@ -17,9 +17,9 @@
       </el-table-column>
       <el-table-column align="center" prop="productName" label="产品名称" style="width: 60px;"></el-table-column>
       <el-table-column align="center" prop="productBrief" label="产品简介" style="width: 60px;"></el-table-column>
-      <el-table-column align="center" label="产品图片" width="170">
+      <el-table-column align="center" label="产品图片" width="270px">
         <template slot-scope="scope">
-          <img :src="scope.row.productPicture">
+          <img :src="'/api'+scope.row.productPicture" style="width: 170px;height: 80px">
         </template>
       </el-table-column>
       <el-table-column align="center" label="管理" width="200" v-if="hasPerm('product:update')">

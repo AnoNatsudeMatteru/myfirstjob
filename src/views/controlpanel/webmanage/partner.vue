@@ -18,9 +18,9 @@
       <el-table-column align="center" prop="partnerName" label="合作伙伴名称" style="width: 60px;"></el-table-column>
       <el-table-column align="center" prop="partnerLink" label="合作伙伴官网地址" style="width: 60px;"></el-table-column>
       <el-table-column align="center" prop="partnerBrief" label="合作伙伴简介" style="width: 60px;"></el-table-column>
-      <el-table-column align="center" label="合作伙伴logo" width="170">
+      <el-table-column align="center" label="合作伙伴logo" width="270px">
         <template slot-scope="scope">
-          <img :src="scope.row.partnerLogo">
+          <img :src="'/api'+scope.row.partnerLogo" style="width: 170px">
 <!--          <span>{{scope.row.createTime}}</span>-->
         </template>
       </el-table-column>

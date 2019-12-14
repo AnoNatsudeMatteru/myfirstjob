@@ -15,7 +15,7 @@
           <span v-text="getIndex(scope.$index)"> </span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="角色" prop="characterName" width="80"></el-table-column>
+      <el-table-column align="center" label="角色" prop="characterName" width="100"></el-table-column>
       <el-table-column align="center" label="用户">
         <template slot-scope="scope">
 <!--          <div v-for="user in scope.row.users">-->
@@ -24,12 +24,12 @@
           <span v-text="scope.row.users.length+'人'"/>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="菜单&权限" width="600">
+      <el-table-column align="center" label="菜单&权限" width="700">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.characterId===1" type="success">全部</el-tag>
           <div v-else>
             <div v-for="menu in scope.row.menus" style="text-align: left">
-              <span style="width: 100px;display: inline-block;text-align: right ">{{menu.menuComment}}</span>
+              <span style="width: 120px;display: inline-block;text-align: right ">{{menu.menuComment}}</span>
               <el-tag v-for="perm in menu.permissions" :key="perm.description" v-text="perm.description"
                       style="margin-right: 3px;"
                       type="primary"></el-tag>
