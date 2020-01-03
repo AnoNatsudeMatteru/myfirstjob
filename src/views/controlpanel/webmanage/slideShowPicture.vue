@@ -54,10 +54,11 @@
             :on-success="handleImageSuccess"
             class="image-uploader"
             drag
-            action="/api/picture/slideShowPicture/"
+            action="/api/admin/picture/slideShowPicture/"
             :auto-upload="true"
             :with-credentials="true"
           >
+<!--            action="/api/picture/slideShowPicture/"-->
             <i class="el-icon-upload" />
             <div class="el-upload__text">
               将文件拖到此处，或<em>点击上传</em>
@@ -124,7 +125,7 @@
             getList() {
                 this.listLoading = true;
                 this.api({
-                    url: "/slideShowPicture/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize ,
+                    url: "/slideShowPicture/resource/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize ,
                     method: "get",
                     //params: this.listQuery
                 }).then(data => {

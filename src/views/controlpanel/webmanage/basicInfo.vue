@@ -17,9 +17,60 @@
         <el-button type="primary" style="float: right" @click="postCulture" v-if="hasPerm('basicinfo:update')">保存</el-button>
       </el-tab-pane>
       <el-tab-pane label="发展历史" name="fourth">
-        <editoritem v-model="history.historyContent"></editoritem>
-        <p>&nbsp;</p>
-        <el-button type="primary" style="float: right" @click="postHistory" v-if="hasPerm('basicinfo:update')">保存</el-button>
+        <div class="filter-container">
+          <el-form>
+            <el-form-item>
+              <el-button type="primary" icon="plus" @click="showCreateHistory" v-if="hasPerm('basicinfo:add')">添加
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+        <el-table :data="listHistory" v-loading.body="listLoading" element-loading-text="拼命加载中" border fit
+                  highlight-current-row>
+          <el-table-column align="center" label="序号" width="80">
+            <template slot-scope="scope">
+              <span v-text="getIndex(scope.$index)"> </span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" prop="historyTitle" label="事件名称" style="width: 60px;"/>
+          <el-table-column align="center" prop="historyContent" label="事件内容" style="width: 60px;"/>
+          <el-table-column align="center" label="发生时间" width="270">
+            <template slot-scope="scope">
+              <span>{{scope.row.historyDate}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column align="center" label="管理" width="400">
+            <template slot-scope="scope">
+              <el-button type="primary" icon="edit" @click="showUpdateHistory(scope.$index)" v-if="hasPerm('basicinfo:update')">修改</el-button>
+              <el-button type="danger" icon="delete" @click="deleteHistory(scope.$index)" v-if="hasPerm('basicinfo:delete')">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-dialog :title="textMapHistory[dialogStatusHistory]" :visible.sync="dialogFormVisibleHistory">
+          <el-form class="small-space" :model="history" label-position="left" label-width="80px"
+                   style='width: 600px; margin-left:50px;'>
+            <el-form-item label="事件名称" required>
+              <el-input type="text" v-model="history.historyTitle">
+              </el-input>
+            </el-form-item>
+            <el-form-item label="事件内容" required>
+              <el-input type="textarea" v-model="history.historyContent">
+              </el-input>
+            </el-form-item>
+            <el-form-item label="发生时间">
+              <el-date-picker
+                v-model="history.historyDate"
+                type="date"
+                placeholder="选择日期">
+              </el-date-picker>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogFormVisibleHistory = false">取 消</el-button>
+            <el-button v-if="dialogStatusHistory=='create'" type="success" @click="postHistory">创 建</el-button>
+            <el-button type="primary" v-else @click="updateHistory">修 改</el-button>
+          </div>
+        </el-dialog>
       </el-tab-pane>
       <el-tab-pane label="公司荣誉" name="fifth">
         <div class="filter-container">
@@ -50,7 +101,7 @@
           </el-table-column>
           <el-table-column align="center" label="管理" width="400">
             <template slot-scope="scope">
-              <el-button type="primary" icon="edit" @click="showUpdate(scope.$index)" v-if="hasPerm('basicinfo:update')">修改</el-button>
+              <el-button type="primary" icon="edit" @click="showUpdateHonor(scope.$index)" v-if="hasPerm('basicinfo:update')">修改</el-button>
               <el-button type="danger" icon="delete" @click="deleteHonor(scope.$index)" v-if="hasPerm('basicinfo:delete')">删除</el-button>
             </template>
           </el-table-column>
@@ -64,7 +115,7 @@
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper">
         </el-pagination>
-        <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+        <el-dialog :title="textMapHonor[dialogStatusHonor]" :visible.sync="dialogFormVisibleHonor">
           <el-form class="small-space" :model="tempHonor" label-position="left" label-width="150px"
                    style='width: 500px; margin-left:50px;' enctype="multipart/form-data">
             <el-form-item label="荣誉名称">
@@ -98,8 +149,8 @@
             </el-form-item>
           </el-form >
           <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button v-if="dialogStatus=='create'" type="success" @click="creatHonor">创 建</el-button>
+            <el-button @click="dialogFormVisibleHonor = false">取 消</el-button>
+            <el-button v-if="dialogStatusHonor=='create'" type="success" @click="creatHonor">创 建</el-button>
             <el-button type="primary" v-else @click="updateHonor">修 改</el-button>
           </div>
         </el-dialog>
@@ -155,7 +206,10 @@
                 history:{
                     historyId:"",
                     historyContent:"",
+                    historyTitle:"",
+                    historyDate:"",
                 },
+                listHistory:[],
                 listHonor:[],
                 tempHonor:{
                     honorId:"",
@@ -163,16 +217,22 @@
                     honorPicture:"",
                     honorTime:"",
                 },
-                dialogStatus: 'create',
-                dialogFormVisible: false,
+                dialogStatusHistory: 'create',
+                dialogFormVisibleHistory: false,
+                dialogStatusHonor: 'create',
+                dialogFormVisibleHonor: false,
                 listQuery: {
                     pageNum: 1,//页码
                     pageSize: 50,//每页条数
                 },
                 totalCount: 0, //分页组件--数据总条数
-                textMap: {
+                textMapHonor: {
                     update: '编辑',
                     create: '添加荣誉'
+                },
+                textMapHistory: {
+                    update: '编辑',
+                    create: '添加事件'
                 },
             }
         },
@@ -206,7 +266,7 @@
             getAdvantage(){
                 this.listLoading=true;
                 this.api({
-                    url:"/advantage",
+                    url:"/advantage/resource",
                     method:"get",
                 }).then(data =>{
                     this.listLoading=false;
@@ -217,7 +277,7 @@
             getBasicInfo(){
                 this.listLoading=true;
                 this.api({
-                    url:"/basicInfo",
+                    url:"/basicInfo/resource",
                     method:"get",
                 }).then(data =>{
                     this.listLoading=false;
@@ -230,7 +290,7 @@
             getBrief(){
                 this.listLoading=true;
                 this.api({
-                    url:"/brief",
+                    url:"/brief/resource",
                     method:"get",
                 }).then(data =>{
                     this.listLoading=false;
@@ -241,7 +301,7 @@
             getCulture(){
                 this.listLoading=true;
                 this.api({
-                    url:"/culture",
+                    url:"/culture/resource",
                     method:"get",
                 }).then(data =>{
                     this.listLoading=false;
@@ -252,18 +312,17 @@
             getHistory(){
                 this.listLoading=true;
                 this.api({
-                    url:"/history",
+                    url:"/history/resource",
                     method:"get",
                 }).then(data =>{
                     this.listLoading=false;
-                    this.history.historyContent=data.list.historyContent;
-                    this.history.historyId=data.list.historyId;
+                    this.listHistory=data.list;
                 })
             },
             getHonor(){
                 this.listLoading=true;
                 this.api({
-                    url:"/honor/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize,
+                    url:"/honor/resource/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize,
                     method:"get",
                 }).then(data =>{
                     this.listLoading=false;
@@ -325,9 +384,38 @@
                     data: this.history
                 }).then(data =>{
                     this.listLoading=false;
-                    this.history.historyContent=data.list.historyContent;
-                    this.history.historyId=data.list.historyId;
+                    this.dialogFormVisibleHistory = false;
                     this.getHistory()
+                })
+            },
+            updateHistory(){
+                this.listLoading=true;
+                this.api({
+                    url:"/history",
+                    method:"put",
+                    data: this.history
+                }).then(data =>{
+                    this.listLoading=false;
+                    this.dialogFormVisibleHistory = false;
+                    this.getHistory()
+                })
+            },
+            deleteHistory($index){
+                let _vue = this;
+                this.$confirm('确定删除此事件?', '提示', {
+                    confirmButtonText: '确定',
+                    showCancelButton: false,
+                    type: 'warning'
+                }).then(() => {
+                    let historyId = _vue.listHistory[$index].historyId;
+                    _vue.api({
+                        url:"/history/"+historyId,
+                        method:"delete",
+                    }).then(() => {
+                        _vue.getHistory()
+                    }).catch(() => {
+                        _vue.$message.error("删除失败")
+                    })
                 })
             },
             creatHonor(){
@@ -338,7 +426,7 @@
                     data: this.tempHonor
                 }).then(data =>{
                     this.listHonor=data.list;
-                    this.dialogFormVisible = false;
+                    this.dialogFormVisibleHonor = false;
                     this.getHonor();
                 })
             },
@@ -350,18 +438,26 @@
                     data: this.tempHonor
                 }).then(data =>{
                     this.listHonor=data.list;
-                    this.dialogFormVisible = false;
+                    this.dialogFormVisibleHonor = false;
                     this.getHonor();
                 })
             },
             deleteHonor($index){
-                this.listLoading=true;
-                this.api({
-                    url:"/honor/"+this.listHonor[$index].honorId,
-                    method:"delete",
-                }).then(data =>{
-                    this.listLoading=false;
-                    this.getHonor();
+                let _vue = this;
+                this.$confirm('确定删除此荣誉?', '提示', {
+                    confirmButtonText: '确定',
+                    showCancelButton: false,
+                    type: 'warning'
+                }).then(() => {
+                    let honorId = _vue.listHonor[$index].honorId;
+                    _vue.api({
+                        url:"/honor/"+honorId,
+                        method:"delete",
+                    }).then(() => {
+                        _vue.getHonor()
+                    }).catch(() => {
+                        _vue.$message.error("删除失败")
+                    })
                 })
             },
             handleSizeChange(val) {
@@ -371,12 +467,12 @@
             },
             handleCurrentChange(val) {
                 //改变页码
-                this.listQuery.pageNum = val
+                this.listQuery.pageNum = val;
                 this.getHonor();
             },
             handleFilter() {
                 //查询事件
-                this.listQuery.pageNum = 1
+                this.listQuery.pageNum = 1;
                 this.getHonor()
             },
             getIndex($index) {
@@ -388,17 +484,35 @@
                 this.tempHonor.honorName = "";
                 this.tempHonor.honorPicture = "";
                 this.tempHonor.honorTime = "";
-                this.dialogStatus = "create";
-                this.dialogFormVisible = true;
+                this.dialogStatusHonor = "create";
+                this.dialogFormVisibleHonor = true;
             },
-            showUpdate($index) {
+            showCreateHistory() {
+                //显示新增对话框
+                this.history.historyId = "";
+                this.history.historyTitle = "";
+                this.history.historyContent = "";
+                this.history.historyContent = "";
+                this.dialogStatusHistory = "create";
+                this.dialogFormVisibleHistory = true;
+            },
+            showUpdateHonor($index) {
                 //显示修改对话框
                 this.tempHonor.honorId = this.listHonor[$index].honorId;
                 this.tempHonor.honorName = this.listHonor[$index].honorName;
                 this.tempHonor.honorPicture = this.listHonor[$index].honorPicture;
                 this.tempHonor.honorTime = this.listHonor[$index].honorTime;
-                this.dialogStatus = "update";
-                this.dialogFormVisible = true
+                this.dialogStatusHonor = "update";
+                this.dialogFormVisibleHonor = true
+            },
+            showUpdateHistory($index) {
+                //显示修改对话框
+                this.history.historyId = this.listHistory[$index].historyId;
+                this.history.historyTitle = this.listHistory[$index].historyTitle;
+                this.history.historyContent = this.listHistory[$index].historyContent;
+                this.history.historyDate = this.listHistory[$index].historyDate;
+                this.dialogStatusHistory = "update";
+                this.dialogFormVisibleHistory = true
             },
         }
     }

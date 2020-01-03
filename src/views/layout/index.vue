@@ -1,5 +1,5 @@
 <template>
-    <span>过度</span>
+
 </template>
 
 <script>

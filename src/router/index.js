@@ -5,6 +5,7 @@ import Router from 'vue-router'
 import Layout from '../views/layout/Layout'
 import Index from '../views/layout/index'
 import {AppMain} from "../views/layout/components";
+import newsdeatil from "../views/controlpanel/webmanage/newsdeatil";
 
 const _import = require('./_import_' + process.env.NODE_ENV)
 Vue.use(Router)
@@ -20,10 +21,16 @@ export const constantRouterMap = [
     children: [{
       path: 'dashboard', component: _import('dashboard/index')
     }]
+  },
+  {
+    path: '/newsdeatil',
+    component: newsdeatil,
+    name: 'newsdeatil',
   }
 ]
 export default new Router({
-  // mode: 'history', //后端支持可开
+  mode: 'history', //后端支持可开
+  base: '/api/admin',
   scrollBehavior: () => ({y: 0}),
   routes: constantRouterMap
 })
@@ -81,6 +88,9 @@ export const asyncRouterMap = [
             path:'product', name: '产品管理',component: _import('controlpanel/webmanage/product'), meta: {title: '产品管理', icon: 'el-icon-s-platform'}, menu: 'product'
           },
           {
+            path:'example', name: '案例管理',component: _import('controlpanel/webmanage/example'), meta: {title: '案例管理', icon: 'el-icon-s-platform'}, menu: 'example'
+          },
+          {
             path:'partner', name: '合作伙伴管理',component: _import('controlpanel/webmanage/partner'), meta: {title: '合作伙伴管理', icon: 'el-icon-s-cooperation'}, menu: 'partner'
           },
           {
@@ -93,5 +103,5 @@ export const asyncRouterMap = [
       }
     ]
   },
-  {path: '*', redirect: '/404', hidden: true}
+  {path: '*', redirect: '/404', hidden: true},
 ]

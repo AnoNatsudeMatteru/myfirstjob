@@ -56,7 +56,7 @@
                 // http://192.168.89.125:8080/admin/storage/create
                 this.editor = new E(this.$refs.toolbar, this.$refs.editor)
                 this.editor.customConfig.uploadImgShowBase64 = false // base 64 存储图片
-                this.editor.customConfig.uploadImgServer = '/api/uploadEditor'// 配置服务器端地址
+                this.editor.customConfig.uploadImgServer = '/api/admin/uploadEditor'// 配置服务器端地址
                 // this.editor.customConfig.uploadImgHeaders = { }// 自定义 header
                 this.editor.customConfig.uploadFileName = 'file' // 后端接受上传文件的参数名
                 this.editor.customConfig.uploadImgMaxSize = 5 * 1024 * 1024 // 将图片大小限制为 2M
@@ -109,7 +109,8 @@
                         //循环插入图片
                         // for (let i = 0; i < 1; i++) {
                         // console.log(result)
-                        let url = "http://192.168.89.125:8080"+result.url
+                        // let url = "http://192.168.89.125:8080"+result.url
+                        let url = "http://http://www.agilephotonics.com/"+result.url
                         insertImg(url)
                         // }
                     }

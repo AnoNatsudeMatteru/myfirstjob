@@ -6,7 +6,8 @@ module.exports = {
     index: path.resolve(__dirname, '../dist/index.html'),
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: './',
+    // assetsPublicPath: '/admin/',
+    assetsPublicPath: '/api/admin/',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
@@ -22,17 +23,22 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    host: '192.168.89.125',
+    // host: '192.168.89.125',
+    host: '192.168.142.131',
+    // host: '192.168.89.154',
     port: 9520,
     autoOpenBrowser: true,
     autoOpenPage: '/login',
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api': {
-        target: 'http://192.168.89.125:8080',
+      '/api/admin': {
+        target: 'http://192.168.142.131:9900/api/admin',
+        // target: 'http://www.agilephotonics.com/api/',
+        // target: 'http://192.168.89.125:8080',
+        // target: 'http://192.168.89.154:10080/api/admin',
         pathRewrite: {
-          '^/api': '/'
+          '^/api/admin': '/'
         }
       }
     },
@@ -42,5 +48,5 @@ module.exports = {
     // In our experience, they generally work as expected,
     // just be aware of this issue when enabling this option.
     cssSourceMap: false
-  }
+  },
 }

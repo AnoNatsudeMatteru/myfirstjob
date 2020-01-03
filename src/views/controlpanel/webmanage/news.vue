@@ -107,7 +107,7 @@
             getList() {
                 this.listLoading = true;
                 this.api({
-                    url: "/news/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize ,
+                    url: "/news/resource/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize ,
                     method: "get",
                     //params: this.listQuery
                 }).then(data => {
@@ -148,7 +148,7 @@
             showUpdate($index) {
                 //显示修改对话框
                 this.api({
-                    url: "/news/"+this.list[$index].newsId,
+                    url: "/news/resource/"+this.list[$index].newsId,
                     method: "get",
                 }).then( data =>{
                     this.tempNews.newsId = data.list.newsId;
@@ -174,6 +174,7 @@
             },
             updateNews() {
                 //修改文章
+                this.tempNews.newsPicture=this.firstImg(this.tempNews.newsContent);
                 this.api({
                     url: "/news",
                     method: "put",
@@ -200,6 +201,9 @@
                         _vue.$message.error("删除失败")
                     })
                 })
+            },
+            showDetail($index){
+                this.$router.push({name: 'newsdeatil',query:{ newsId: this.list[$index].newsId}});
             },
             firstImg(str){
                 let img = '';

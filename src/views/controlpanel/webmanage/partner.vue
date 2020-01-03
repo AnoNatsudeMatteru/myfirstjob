@@ -54,10 +54,11 @@
             :on-success="handleImageSuccess"
             class="image-uploader"
             drag
-            action="/api/picture/partner/"
+            action="/api/admin/picture/partner/"
             :auto-upload="true"
             :with-credentials="true"
           >
+<!--            action="/api/picture/partner/"-->
             <i class="el-icon-upload" />
             <div class="el-upload__text">
               将文件拖到此处，或<em>点击上传</em>
@@ -151,7 +152,7 @@
         //查询列表
         this.listLoading = true;
         this.api({
-          url: "/partners"+"/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize,
+          url: "/partners"+"/resource/"+this.listQuery.pageNum+"/"+this.listQuery.pageSize,
           method: "get",
           // params: this.listQuery
         }).then(data => {
